@@ -29,6 +29,14 @@ care of the encoding for us and we don't need to do it manually, but it's still
 good to know how it works under the hood, so let's see what a typical IP packet
 looks like:
 
+이제 우리는 두 대의 컴퓨터로 구성된 가상의 작은 네트워크에서 IP 주소가 어떻게 사용되는지 살펴 보았습니다.
+그러나 주소를 아는 것만으로는 유용한 작업을 수행 할 수 없습니다. 기계는 잘 알려진 프로토콜을 따라야 예측 가능한 방식으로 서로 통신 할 수 있습니다. [TCP / IP] (https://en.wikipedia.org/wiki/Internet_protocol_suite)라고도하는 인터넷 프로토콜 제품군은 인터넷에서 사용되는 표준 프로토콜 모음입니다.
+
+프로토콜 제품군은 여러 프로토콜로 구성되며, 그중 두 가지 인 IP와 UDP (나중에 TCP 및 기타 프로토콜에 대해서도 다룹니다)에 관심이 있습니다.
+
+&#8203;<abbr title="Internet Protocol">IP</abbr>는 네트워킹의 토대입니다.
+높은 수준의 프로토콜을 위한 기초 역할을합니다. 컴퓨터는 메시지를 교환 할 때 최대 65KB 크기의 개별 메시지 단위로 볼 수있는 IP _패킷들_ 로 인코딩합니다. 일반적으로 운영 체제가 인코딩을 처리하므로 수동으로 수행 할 필요는 없지만 내부에서 어떻게 작동하는지 아는 것이 좋습니다. 일반적인 IP 패킷이 어떻게 보이는지 살펴 보겠습니다.
+
 <Playground id="ipPackets" codeWrapperFn={wrapIpHeaderCode}>
   <IpPacketsVis />
 </Playground>
@@ -44,6 +52,12 @@ number ranging from `0x00` to `0xFF`, which [corresponds to decimal](https://duc
 `0` to `255`). This demonstrates that the IP header is just a sequence of numbers that we can interpret
 and represent in different ways. If you are not comfortable with hexadecimal numbers, you can refer to
 the [prerequisite lesson on number encoding](/prerequisites/binary-and-hexadecimal-numbers).
+
+이 코드를 실행하면 테이블에 구조화되지 않은 IP 패킷이 표시됩니다. 각 테이블 셀에는 패킷 헤더의 개별 필드가 있습니다. 코드에서 설정 한 헤더 필드는 녹색으로 강조 표시됩니다. 지금은 나머지 필드를 건너 뛸 수 있습니다.
+
+오른쪽에는 압축성 때문에 바이트를 나타내는 데 자주 사용되는 _hexadecimal_ 숫자 시스템에서 정확히 동일한 패킷을 볼 수 있습니다.
+(각 단일 바이트는`0x00`에서`0xFF`까지의 16 진수로 인코딩 할 수 있습니다. [십진수에 해당하는](https://duckduckgo.com/?q=0xFF+in+decimal&t=hk&ia=answer)`0` ~`255`).
+이것은 IP 헤더가 우리가 다양한 방식으로 해석하고 표현할 수있는 일련의 숫자임을 보여줍니다. 16 진수에 익숙하지 않은 경우 [숫자 인코딩에 대한 필수 강의](/prerequisites/binary-and-16decimal-numbers)를 참조하세요.
 
 ## User Datagram Protocol
 
@@ -67,9 +81,22 @@ that the original network packet is not corrupted during transmission. And that'
 
 Let's construct a UDP datagram header and add it to the previous example:
 
+&#8203; <abbr title = "User Datagram Protocol">UDP</abbr> 또는 User Datagram Protocol은 메시지에 대한 컨텍스트 정보를 더 추가하는 IP 위의 얇은 레이어입니다.
+UDP <abbr title="데이터 + 텔레 그램의 단어 조합">데이터 그램</abbr>도 헤더와 페이로드로 나뉩니다. 재미있는 점은 전체 UDP 데이터 그램이 IP 패킷의 _payload_라는 것입니다!
+이것을 _encapsulation_이라고하며 네트워킹의 핵심 아이디어 중 하나입니다. IP와 같은 네트워크 스택의 단일 계층은 TCP 및 UDP와 같은 인터넷 프로토콜 제품군의 프로토콜이거나 사용자가 정의한 프로토콜 일 수있는 페이로드를 모르고 신경 쓰지 않습니다.
+
+UDP 헤더는 길이가 8 바이트에 불과합니다. 여기에는 동일한 컴퓨터에서 실행되는 서로 다른 서비스를 식별하는 데 도움이되는 소스 및 대상 _포트 번호_가 포함되어 있습니다.
+서버에 많은 기능이있는 것은 매우 일반적입니다. 일반적으로 규칙에 따라 특정 서비스에 대한 특정 포트 번호를 지정합니다. 예를 들어 이름 서버는 일반적으로 포트 번호 53을 사용합니다.
+
+UDP 헤더에는 데이터 그램의 총 크기 (바이트)와 전송 중에 원본 네트워크 패킷이 손상되지 않았는지 확인하는 데 사용되는 _checksum_도 포함됩니다. 그리고 이것이 IP 헤더에 추가되는 전부입니다!
+
+UDP 데이터 그램 헤더를 구성하고 이전 예제에 추가해 보겠습니다.
+
 <Playground id="udpDatagram" codeWrapperFn={wrapUdpHeaderCode}>
   <UdpDatagramVis />
 </Playground>
 
 Now we are ready to move onto sending messages we have constructed
 over the network!
+
+이제 네트워크를 통해 구축 한 메시지를 보낼 준비가되었습니다!
